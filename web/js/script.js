@@ -35,9 +35,24 @@ function getHeaderColor(headerColor){
     return color || "UNKNOWN"
 }
 
+function _progress(data, isInit=false, isFinished=false){
+    const progress = document.getElementById("progress")
+    const sourceText = progress.dataset.text;
+
+    if (isInit){
+        progress.textContent = `${sourceText}0:00`;
+    } else if (isFinished) {
+        progress.textContent = `${sourceText}已完成`
+    } else {
+        if (!data.time_text) return;
+        progress.textContent = `${sourceText}${data.time_text}`
+    }
+}
+
 function ondata(data){
     if (!data.hasOwnProperty("header_color")) return;
     if (!data.message) return;
+    _progress(data)
     const filters = {
         author: x => document.getElementById("author").value && x.author.includes(document.getElementById("author").value),
         message: x => document.getElementById("message").value && x.message.includes(document.getElementById("message").value),
@@ -48,34 +63,19 @@ function ondata(data){
     }
 }
 
-function getTextWidth(inputText) { 
-    if (!window.calaTextWidthCanvas){
-        inputText = "Geeks For Geeks"; 
-        font = "16px times new roman"; 
-
-        window.calaTextWidthCanvas = document.createElement("canvas"); 
-    }
-    const context = window.calaTextWidthCanvas.getContext("2d"); 
-    context.font = font; 
-
-    const width = context.measureText(inputText).width; 
-    return width
-} 
-
-let maxAuthorWidth = 0
-
 function addData(data){
     const id = uuidv4()
     const template = document.getElementById("newLine")
 
-    const tr = template.content.querySelector("tr")
+    const clone = document.importNode(template.content, true);
+
+    const tr = clone.querySelector("tr")
     const tds = tr.querySelectorAll("td")
 
     tds[0].textContent = data.author
     tds[1].textContent = COLOR_TEXTS[getHeaderColor(data.header_color.rgba)]
     tds[2].textContent = data.message
-
-    const clone = document.importNode(template.content, true);
+    
     const button = clone.querySelector("td button");
     button.id = id;
     clone.querySelector("td button").addEventListener("click", e => {
@@ -100,12 +100,6 @@ function addData(data){
 
     document.querySelector("tbody").appendChild(clone);
     window.scData[id] = data;
-
-    const authorWidth = getTextWidth(data.author)
-    if (authorWidth > maxAuthorWidth){
-        maxAuthorWidth = authorWidth
-        window.adjustTable()
-    }
 }
 
 function downloadURI(uri, name) {
@@ -131,9 +125,10 @@ function ws(videoId){
             case "init":
                 break
             case "data":
-                ondata(data.data);
+                ondata(data.data, false);
                 break;
             case "finish":
+                _progress(null, false, true)
                 download(data.filename);
                 break;
         }
@@ -145,6 +140,8 @@ function init(){
     for(const tr of document.querySelectorAll("tbody > tr")){
         tr.remove()
     }
+    maxAuthorWidth = 0;
+    _progress(null, true)
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -169,11 +166,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("upload").addEventListener('change', () => {
         init()
         const upload = document.getElementById("upload")
-        const file = upload.files[0]
-        new LineReader(file).readLines(line => {
+        const file = upload.files[0];
+        new LineReader(file).readLines(async line => {
             const rawText = atob(line);
             const data = JSON.parse(rawText)
-            ondata(data) 
+            ondata(data, true)
+        }, () => {
+            _progress(null, false, true)
         })
         upload.value = null;
     }, false)

@@ -107,6 +107,6 @@ if __name__ == "__main__":
     port = random.randint(3000, 60000)
     url = f"http://localhost:{port}"
 
-    threading.Timer(1.25, lambda: webbrowser.open(url, 1)).start()
+    threading.Timer(1.5, lambda: webbrowser.open(f"{url}", 1)).start()
 
     app.run(port=port, debug=False)

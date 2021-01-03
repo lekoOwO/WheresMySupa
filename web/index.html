@@ -4,7 +4,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.3/tocas.css" rel="stylesheet">
     <script src="js/lineReader.js"></script>
     <script src="js/script.js"></script>
-    <script src="js/style.js"></script>
     <style>
         .centerCell {
             text-align: center;
@@ -25,6 +24,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            max-width: 0;
         }
 
         .hide {
@@ -56,7 +56,6 @@
             width: 100%;
         }
     </style>
-    <style id="contentCellWidth"></style>
 </head>
 
 <body>
@@ -112,6 +111,9 @@
     <div class="ts narrow container">
         <table class="ts single line sortable table">
             <thead>
+                <tr>
+                    <th colspan="4" data-text="讀取進度: " id="progress">讀取進度: 0:00</th>
+                </tr>
                 <tr>
                     <th>贊助者</th>
                     <th>SC 顏色</th>
