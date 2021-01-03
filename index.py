@@ -9,11 +9,18 @@ import requests
 import re
 import base64
 import webbrowser, random, threading
+import sys
+from pathlib import Path
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    base_dir = Path(sys._MEIPASS)
+else:
+    base_dir = Path(__file__).parent
 
 def chat_messages_archive(chat_messages, video_id):
     filename = f"{video_id}.{time.time_ns()}.supa"
 
-    with open(f"./data/{filename}", 'a+', newline='', encoding='utf-8') as f:
+    with open(f"{base_dir}/data/{filename}", 'a+', newline='', encoding='utf-8') as f:
         for message in chat_messages:
             data = json.dumps(message)
             data = data.encode("utf-8")
@@ -27,11 +34,11 @@ app = Quart(__name__)
 
 @app.route("/")
 async def main():
-    return await send_from_directory("web", "index.html")
+    return await send_from_directory(f"{base_dir}/web", "index.html")
 
 @app.route("/js/<filename>")
 async def js(filename):
-    return await send_from_directory("web/js", os.path.basename(filename))
+    return await send_from_directory(f"{base_dir}/web/js", os.path.basename(filename))
 
 @app.route("/avatar/<channel_id>")
 @route_cors(allow_origin="https://ytsc.leko.moe")
@@ -45,7 +52,7 @@ async def avatar(channel_id):
 @app.route('/data/<filename>')
 def download_and_remove(filename):
     filename = os.path.basename(filename)
-    path = os.path.join(current_app.root_path, "data", filename)
+    path = os.path.join(base_dir, "data", filename)
 
     def generate():
         with open(path, "rb") as f:

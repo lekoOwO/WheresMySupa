@@ -8,6 +8,13 @@ function uuidv4() {
     );
 }
 
+function getYoutubeID(url){
+    const regex = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+    window.youtubeId = url.match(regex)[1];
+
+    return window.youtubeId
+}
+
 const COLORS = {
     CYAN: [0, 191, 165],
     YELLOW: [255, 179, 0],
@@ -147,8 +154,9 @@ function init(){
 document.addEventListener("DOMContentLoaded", () => {
     ts('.ts.sortable.table').tablesort();
 
-    document.getElementById("start").addEventListener("click", e => {
-        const videoId = document.getElementById("videoId").value
+    document.getElementById("start").addEventListener("click", () => {
+        let videoId = document.getElementById("videoId").value
+        if (videoId.includes(".")) videoId = getYoutubeID(videoId)
         ws(videoId);
     })
 
