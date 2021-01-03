@@ -138,6 +138,9 @@ function ws(videoId){
                 _progress(null, false, true)
                 download(data.filename);
                 break;
+            case "error":
+                console.error(data.data)
+                break;
         }
     }
 }

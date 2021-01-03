@@ -19,8 +19,12 @@ else:
 
 def chat_messages_archive(chat_messages, video_id):
     filename = f"{video_id}.{time.time_ns()}.supa"
+    dirname = os.path.join(base_dir, "data")
 
-    with open(f"{base_dir}/data/{filename}", 'a+', newline='', encoding='utf-8') as f:
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+
+    with open(os.path.join(dirname, filename), 'a+', newline='', encoding='utf-8') as f:
         for message in chat_messages:
             data = json.dumps(message)
             data = data.encode("utf-8")
