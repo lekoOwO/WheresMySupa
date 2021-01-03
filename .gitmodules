@@ -1,0 +1,3 @@
+[submodule "chat_replay_downloader"]
+	path = chat_replay_downloader
+	url = https://github.com/xenova/chat-replay-downloader

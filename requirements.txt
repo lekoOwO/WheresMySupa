@@ -1,0 +1,8 @@
+requests
+datetime
+regex
+argparse
+emoji
+websockets
+quart-cors 
+quart

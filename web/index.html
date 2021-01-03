@@ -1,0 +1,141 @@
+<html>
+
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.3/tocas.css" rel="stylesheet">
+    <script src="js/lineReader.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/style.js"></script>
+    <style>
+        .centerCell {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .centerTable {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        tr > :not(.contentCell) {
+            width: 1%;
+            white-space: nowrap;
+        }
+
+        .contentCell {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        #uploader {
+            padding: 0em;
+            position: relative;
+            height: 150px;
+        }
+
+        #uploader>.header {
+            padding-top: 2em;
+            padding-bottom: .5em;
+        }
+
+        #uploader #upload {
+            z-index: 5;
+            font-size: 30px;
+            cursor: pointer;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            opacity: 0;
+        }
+
+        table {
+            width: 100%;
+        }
+    </style>
+    <style id="contentCellWidth"></style>
+</head>
+
+<body>
+    <div class="ts attached heading slate">
+        <div class="ts narrow container">
+            <span class="header">WheresMySupa</span>
+            <span class="description">Youtube SuperChat 過濾器</span>
+        </div>
+    </div>
+    <br><br>
+    <div class="ts narrow container">
+        <button class="ts labeled icon basic hide button inputStatus">
+            <i class="file text outline icon"></i>
+            文件
+        </button>
+        <button class="ts labeled icon basic button inputStatus">
+            <i class="youtube play icon"></i>
+            線上抓取
+        </button>
+        <br><br>
+        <div>
+            <div class="ts action circular fluid input inputSource">
+                <input id="videoId" type="text" placeholder="Youtube 影片網址">
+                <button id="start" class="ts positive basic button">開始</button>
+            </div>
+        </div>
+        <div class="ts narrow container hide inputSource">
+            <div class="ts basic dashed clickable slate" id="uploader">
+                <input id="upload" type="file">
+                <i class="upload symbol icon"></i>
+                <span class="header">上傳文件</span>
+                <span class="description">將文件拖拉至此處或是點擊此處來選取文件</span>
+            </div>
+        </div>
+        <br><br>
+        <div class="ts buttons">
+            <div class="ts labeled input">
+                <div class="ts label">
+                    <i class="user fitted icon"></i>
+                </div>
+                <input type="text" placeholder="贊助者" id="author">
+            </div>
+            <div class="or"></div>
+            <div class="ts labeled input">
+                <div class="ts label">
+                    <i class="talk outline fitted icon"></i>
+                </div>
+                <input type="text" placeholder="內容" id="message">
+            </div>
+        </div>
+    </div>
+    <br><br>
+    <div class="ts narrow container">
+        <table class="ts single line sortable table">
+            <thead>
+                <tr>
+                    <th>贊助者</th>
+                    <th>SC 顏色</th>
+                    <th class="contentCell">內容</th>
+                    <th>　　　　</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template id="newLine">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="contentCell"></td>
+                        <td>
+                            <button class="ts positive basic button">生成</button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</body>
+<footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.3/tocas.js"></script>
+</footer>
+
+</html>
