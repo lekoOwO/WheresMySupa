@@ -2,14 +2,13 @@ from quart import Quart, websocket, send_from_directory, copy_current_websocket_
 from quart_cors import route_cors
 import asyncio
 from chat_replay_downloader.chat_replay_downloader import ChatReplayDownloader
-import csv
 import time
 import os
-import tempfile
 import json
 import requests
 import re
 import base64
+import webbrowser, random, threading
 
 def chat_messages_archive(chat_messages, video_id):
     filename = f"{video_id}.{time.time_ns()}.supa"
@@ -105,4 +104,9 @@ async def ws(video_id):
         })
 
 if __name__ == "__main__":
-    app.run()
+    port = random.randint(3000, 60000)
+    url = f"http://localhost:{port}"
+
+    threading.Timer(1.25, lambda: webbrowser.open(url, 1)).start()
+
+    app.run(port=port, debug=False)
