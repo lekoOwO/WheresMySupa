@@ -1,7 +1,6 @@
 from quart import Quart, websocket, send_from_directory, copy_current_websocket_context, current_app, redirect
 from quart_cors import route_cors
-import asyncio
-from chat_replay_downloader.chat_replay_downloader import ChatReplayDownloader
+from chat_replay_downloader.chat_replay_downloader import ChatDownloader
 import time
 import os
 import json
@@ -17,22 +16,18 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
 else:
     base_dir = Path(__file__).parent
 
-def chat_messages_archive(chat_messages, video_id):
-    filename = f"{video_id}.{time.time_ns()}.supa"
+def chat_message_archive(message, filename):
     dirname = os.path.join(base_dir, "data")
 
     if not os.path.exists(dirname):
         os.mkdir(dirname)
 
     with open(os.path.join(dirname, filename), 'a+', newline='', encoding='utf-8') as f:
-        for message in chat_messages:
-            data = json.dumps(message)
-            data = data.encode("utf-8")
-            data = base64.b64encode(data)
-            data = data.decode("utf-8") 
-            f.write(f"{data}\n")
-    
-    return filename
+        data = json.dumps(message)
+        data = data.encode("utf-8")
+        data = base64.b64encode(data)
+        data = data.decode("utf-8") 
+        f.write(f"{data}\n")
 
 app = Quart(__name__)
 
@@ -71,34 +66,24 @@ def download_and_remove(filename):
 @app.websocket("/ws/<video_id>")
 async def ws(video_id):
     @copy_current_websocket_context
-    async def _callback(sc):
+    async def callback(sc):
         await websocket.send_json({
             "type": "data",
             "data": sc
         })
     
-    def callback(sc):
-        try:
-            asyncio.get_event_loop().create_task(
-                _callback(sc)      
-            )
-        except RuntimeError:
-            asyncio.run(
-                _callback(sc)      
-            )
-    
-    def main(video_id):
-        return ChatReplayDownloader().get_youtube_messages(video_id, 
-            message_type="superchat",
-            callback = callback
-        )
+    async def main(video_id, filename):
+        chats = ChatDownloader().get_chat(url=f"https://www.youtube.com/watch?v={video_id}", message_groups=['superchat'])
+        for chat in chats:
+            await callback(chat)
+            chat_message_archive(chat, filename)
     
     await websocket.send_json({
         "type": "init"
     })
     try:
-        chat_messages = await asyncio.get_event_loop().run_in_executor(None, main, video_id)
-        filename = await asyncio.get_event_loop().run_in_executor(None, chat_messages_archive, chat_messages, video_id)
+        filename = f"{video_id}.{time.time_ns()}.supa"
+        await main(video_id, filename)
 
         await websocket.send_json({
             "type": "finish",

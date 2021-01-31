@@ -6,3 +6,6 @@ emoji
 websockets
 quart-cors 
 quart
+docstring_parser
+colorlog
+isodate
